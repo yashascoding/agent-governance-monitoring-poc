@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets and environment
+.env
+.env.*
+!.env.example
+
+# Generated outputs
+reports/*.jsonl
+reports/*.json
+reports/*.md
+reports/demo/
+reports/.gitkeep
+
+# AWS
+.aws/
