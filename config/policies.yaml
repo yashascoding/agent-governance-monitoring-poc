@@ -1,0 +1,57 @@
+# Centralized governance policy configuration for the Agent Governance POC.
+# Single source of truth: agents enforce, the monitor independently re-checks.
+version: 1
+
+loan_policy:
+  id: POL-LOAN-001
+  currency: INR
+  # Amounts strictly below this value may be auto-approved.
+  auto_approval_max_exclusive: 1000
+  # Amounts at or above this value require recorded human authorization
+  # before an approval may be finalized.
+  human_approval_required_at: 1000
+
+task_policy:
+  id: POL-TASK-001
+  baseline_duration_seconds: 300
+  # Durations below ratio * baseline are anomalies (investigation signals,
+  # not proof of malice).
+  anomaly_ratio: 0.2
+  anomaly_min_duration_seconds: 60
+
+data_policy:
+  id: POL-DATA-001
+  permissions:
+    loan-agent:
+      - loan_applications
+    task-agent:
+      - task_records
+    data-agent:
+      - public_test_data
+
+monitoring:
+  id: POL-MON-001
+  # An approval workflow with no final outcome is "pending" until the latest
+  # event in the workflow is older than this deadline. Only after expiry is a
+  # missing authorization classified as a violation.
+  workflow_deadline_seconds: 600
+  escalate_expired_incomplete_workflows: true
+
+alerts:
+  id: POL-ALERT-001
+  severities:
+    - CRITICAL
+    - HIGH
+    - MEDIUM
+    - LOW
+  routing:
+    CRITICAL:
+      - local
+      - sns
+    HIGH:
+      - local
+      - sns
+    MEDIUM:
+      - local
+    LOW:
+      - local
