@@ -59,6 +59,14 @@ pip install -r requirements.txt
 Copy `.env.example` to `.env` only if you plan to use SNS. The local backend
 needs no credentials.
 
+## Demo video
+
+![Demo walkthrough of the Agent Governance & Monitoring POC](docs/assets/demo.gif)
+
+[Watch the full demo (MP4)](docs/assets/demo.mp4)
+
+The video shows: (1) a single policy file (`config/policies.yaml`) read by both agents and the monitor, (2) the live monitor where compliant actions stay quiet and violations raise alerts/findings, (3) the deadline demo where a missing approval remains `PENDING_INVESTIGATION` until expiry and only then becomes a violation, (4) the test suite executing, and (5) the generated test report. All artifacts are produced by the repo's own commands.
+
 ## Run the demo
 
 ```bash
@@ -68,6 +76,12 @@ python main.py demo
 # Only one mode
 python main.py demo --mode normal
 python main.py demo --mode faulty
+
+# Deadline demo (missing approval becomes a violation after expiry)
+python main.py demo --mode deadline
+
+# Live monitor (watch a sequence in real time)
+python main.py watch --pace 1.2
 
 # Also publish alerts to SNS (requires SNS_TOPIC_ARN)
 python main.py demo --mode faulty --sns

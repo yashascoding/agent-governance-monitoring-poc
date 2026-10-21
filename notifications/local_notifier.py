@@ -10,6 +10,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+import console
 from governance.event_schema import to_utc_iso
 from notifications.base import DeliveryResult
 from governance.findings import Finding
@@ -20,9 +21,12 @@ class LocalNotifier:
     alerts_path: str | Path
     echo: bool = True
     name: str = "local"
+    color: bool | None = None
 
     def __post_init__(self) -> None:
         self.alerts_path = Path(self.alerts_path)
+        if self.color is None:
+            self.color = console.supports_color(sys.stderr)
         try:
             if not self.alerts_path.parent.is_dir():
                 self.alerts_path.parent.mkdir(parents=True, exist_ok=True)
@@ -58,13 +62,18 @@ class LocalNotifier:
             detail=f"alert written to {self.alerts_path}",
         )
 
-    @staticmethod
-    def _print(finding: Finding) -> None:
-        summary = (
-            f"[ALERT][{finding.severity.value}] {finding.rule_id} "
-            f"agent={finding.agent_id} task={finding.task_id} "
-            f"status={finding.status.value} at={to_utc_iso(finding.detected_at)}\n"
-            f"    {finding.observed_behaviour}\n"
-            f"    -> {finding.recommended_response}"
+    def _print(self, finding: Finding) -> None:
+        color = bool(self.color)
+        label = console.severity(f"[{finding.severity.value}]", enabled=color)
+        rule = console.bold(finding.rule_id, enabled=color)
+        meta = console.dim(
+            f"agent={finding.agent_id}  task={finding.task_id}  "
+            f"status={finding.status.value}  at={to_utc_iso(finding.detected_at)}",
+            enabled=color,
         )
-        print(summary, file=sys.stderr)
+        observed = console.dim("observed ", enabled=color)
+        response = console.dim("response ", enabled=color)
+        print(f"{label} {rule}  {meta}", file=sys.stderr)
+        print(f"    {observed} {finding.observed_behaviour}", file=sys.stderr)
+        print(f"    {response} {finding.recommended_response}", file=sys.stderr)
+        print("", file=sys.stderr)
