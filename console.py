@@ -18,6 +18,7 @@ from typing import TextIO
 RESET = "\033[0m"
 BOLD = "\033[1m"
 DIM = "\033[2m"
+GREEN = "\033[32m"
 RED = "\033[31m"
 YELLOW = "\033[33m"
 BLUE = "\033[34m"
