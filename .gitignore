@@ -22,3 +22,10 @@ reports/.gitkeep
 
 # AWS
 .aws/
+
+# Local platform configuration and generated frontend assets
+node_modules/
+dist/
+frontend/dist/
+coverage/
+*.tsbuildinfo
