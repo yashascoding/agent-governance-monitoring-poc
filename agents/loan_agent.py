@@ -18,14 +18,17 @@ connected to a real financial system.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Protocol
 
 from governance.clock import Clock
 from governance.event_schema import Event, EventType, utc_now
-from governance.event_store import JsonlEventStore
 from governance.policy_loader import LoanPolicy
 
 CURRENCY_FIELD = "amount"
+
+
+class EventSink(Protocol):
+    def append(self, event: Event) -> None: ...
 
 
 class ApprovalRequiredError(PermissionError):
@@ -47,7 +50,7 @@ class LoanAgent:
 
     agent_id: str
     policy: LoanPolicy
-    store: JsonlEventStore
+    store: EventSink
     clock: Clock
     run_id: str
     _workflows: dict[str, _WorkflowState] = field(default_factory=dict)
